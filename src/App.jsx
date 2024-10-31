@@ -62,21 +62,23 @@ export default function App() {
     
 
   }, [userId]);
+
   useEffect(()=>{
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs.length > 0) {
-        chrome.tabs.sendMessage(tabs[0].id, { type: "GET_USERID_FROM_LOCAL_STORAGE" }, (response) => {
-          if (chrome.runtime.lastError) {
-            console.error("Error sending message:", chrome.runtime.lastError);
-          } else {
-            console.log("Response from content script:", response);
-          }
-        });
+        try {
+
+          chrome.tabs.sendMessage(tabs[0].id, { action: "GET_USERID_FROM_LOCAL_STORAGE" }, (response) => {
+            // const userId = localStorage.getItem('userId');
+            // const email = localStorage.getItem('email');
+            // chrome.storage.local.get({userId})
+            console.log("App.jsx me response aaya from content/background", response.data);
+          })
+        } catch (err) {
+          console.log("Error sending message from App.jsx", { err })
+        }
       }
     });
-    const userId = localStorage.getItem('userId');
-    const email = localStorage.getItem('email');
-    console.log(userId, email);
   },[]);
 
   const onSuccess = (credentialResponse) => {
