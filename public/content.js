@@ -266,25 +266,48 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "GET_USERID_FROM_LOCAL_STORAGE") {
       // Use chrome.storage.local instead of chrome.localStorage
-      chrome.storage.local.get(["email", "userId"], (result) => {
-        console.log("content", result.email, result.userId);
-        // Send data to background.js
+      // chrome.storage.local.get(["email", "userId"], (result) => {
+      //   console.log("content", result.email, result.userId);
+      //   // Send data to background.js
+      //   chrome.runtime.sendMessage({
+      //     action: "USER_IDS",
+      //     data: {
+      //       userId: "1",
+      //       email: "email",
+      //     }
+      //   });
+
+      //   try {
+
+          
+      //     sendResponse({
+      //       success: true,
+      //       data: {
+      //         userId: result.userId,
+      //         email: result.email
+      //       }
+      //     });
+      //   } catch (err) {
+      //     console.log("Error sending message on Content.js", {err})
+      //   }
+      // });
+      const userId = localStorage.getItem("userId") ?? "12344444";
+      const email = localStorage.getItem("email") ?? "ngellakra@chainlabs.in";
+      console.log("CONTENT", {userId, email})
+      try {
         chrome.runtime.sendMessage({
-          action: "USER_IDS",
-          data: {
-            userId: result.userId,
-            email: result.email,
+          action: "USER_IDS", data: {
+            userId,
+            email
           }
-        });
-  
-        sendResponse({
-          success: true,
-          data: {
-            userId: result.userId,
-            email: result.email
-          }
-        });
-      });
+        }, (response) => {
+          console.log("Response from bg.js", { response });
+          sendResponse(response)
+        })
+        
+      } catch (err) {
+        console.log("Error sending message on Content.js to background", {err})
+      }
       
     }
   });
